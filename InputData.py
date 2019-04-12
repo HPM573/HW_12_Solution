@@ -2,7 +2,7 @@ from enum import Enum
 import numpy as np
 
 # simulation settings
-POP_SIZE = 1000         # cohort population size
+POP_SIZE = 10         # cohort population size
 SIM_LENGTH = 2000    # length of simulation (years)
 ALPHA = 0.05
 DISCOUNT = 0.03     # annual discount rate
@@ -18,14 +18,6 @@ STROKE_DURATION = 1/52  # 1 week
 ANTICOAG_STROKE_REDUCTION = 0.25
 ANTICOAG_BLEEDING_DEATH_INCREASE = 0.05
 
-
-class HealthState(Enum):
-    """ health states of patients """
-    WELL = 0
-    STROKE = 1
-    POST_STROKE = 2
-    STROKE_DEAD = 3
-    NATURAL_DEATH = 4
 
 
 ANNUAL_STATE_UTILITY = [

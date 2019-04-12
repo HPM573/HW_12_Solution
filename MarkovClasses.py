@@ -1,6 +1,6 @@
 import SimPy.RandomVariantGenerators as RVGs
 import SimPy.SamplePathClasses as PathCls
-from InputData import HealthState
+from ParameterClasses import HealthStates
 import SimPy.MarkovClasses as Markov
 import SimPy.StatisticalClasses as Stat
 import SimPy.EconEvalClasses as Econ
@@ -25,14 +25,13 @@ class Patient:
             dt, new_state_index = self.gillespie.get_next_state(
                 current_state_index=self.stateMonitor.currentState.value,
                 rng=self.rng)
-
             if dt is None or dt + t > sim_length:
                 if_stop = True
             else:
                 # increment time
                 t += dt
                 # update health state
-                self.stateMonitor.update(time=t, new_state=HealthState(new_state_index))
+                self.stateMonitor.update(time=t, new_state=HealthStates(new_state_index))
 
 
 class PatientStateMonitor:
@@ -48,7 +47,7 @@ class PatientStateMonitor:
         if new_state == P.HealthStates.STROKE_DEAD or P.HealthStates.NATURAL_DEATH:
             self.survivalTime = time
 
-        if self.currentState == P.HealthStates.STROKE or self.currentState == P.HealthStates.STROKE_DEAD:
+        if new_state == P.HealthStates.STROKE:
             self.nStrokes += 1
 
         self.costUtilityMonitor.update(time=time,
@@ -58,7 +57,7 @@ class PatientStateMonitor:
         self.currentState = new_state
 
     def get_if_alive(self):
-        if self.currentState != HealthState.STROKE_DEAD or self.currentState != HealthState.NATURAL_DEATH:
+        if self.currentState != HealthStates.STROKE_DEAD or self.currentState != HealthStates.NATURAL_DEATH:
             return True
         else:
             return False
