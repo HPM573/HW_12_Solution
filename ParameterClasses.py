@@ -35,11 +35,9 @@ class ParametersFixed:
         # transition probability matrix of the selected therapy
         self.rateMatrix = []
 
-        prob_matrix_none = D.get_trans_rate_matrix(with_treatment=False)
-
         # calculate transition probabilities depending of which therapy options is in use
         if therapy == Therapies.NONE:
-            self.rateMatrix = prob_matrix_none
+            self.rateMatrix = D.get_trans_rate_matrix(with_treatment=False)
         else:
             self.rateMatrix = D.get_trans_rate_matrix(with_treatment=True)
 
