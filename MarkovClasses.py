@@ -81,7 +81,8 @@ class PatientCostUtilityMonitor:
                                                      discount_rate=self.params.discountRate,
                                                      discount_period=(self.tLastRecorded, time))
 
-        discounted_cost += Econ.pv_single_payment(payment=5000,
+        if current_state == P.HealthStates.STROKE or current_state == P.HealthStates.STROKE_DEAD:
+            discounted_cost += Econ.pv_single_payment(payment=5000,
                                                  discount_rate=0.03,
                                                  discount_period=time,
                                                  discount_continuously=True)

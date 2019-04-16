@@ -30,7 +30,7 @@ ANNUAL_STATE_UTILITY = [
 # annual cost of each health state
 ANNUAL_STATE_COST = [
     0,      # WELL
-    0,   # STROKE
+    0,      # STROKE
     200,    # POST-STROKE
     0,      # STROKE DEATH
     0       # NATURAL DEATH
@@ -87,7 +87,7 @@ def get_trans_rate_matrix(with_treatment):
     return rate_matrix
 
 
-print('Transition rate matrix with no treatment:')
-print(get_trans_rate_matrix(with_treatment=False))
-print('Transition rate matrix with treatment:')
-print(get_trans_rate_matrix(with_treatment=True))
+# print('Transition rate matrix with no treatment:')
+# print(get_trans_rate_matrix(with_treatment=False))
+# print('Transition rate matrix with treatment:')
+# print(get_trans_rate_matrix(with_treatment=True))

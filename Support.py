@@ -1,6 +1,5 @@
 import InputData as D
 import SimPy.SamplePathClasses as PathCls
-import SimPy.FigureSupport as Figs
 import SimPy.StatisticalClasses as Stat
 import SimPy.EconEvalClasses as Econ
 import matplotlib.pyplot as plt
@@ -70,25 +69,25 @@ def plot_survival_curves_and_histograms(sim_outcomes_mono, sim_outcomes_combo):
         legends=['Mono Therapy', 'Combination Therapy']
     )
 
-    # histograms of survival times
-    set_of_strokes = [
-        sim_outcomes_mono.nTotalStrokes,
-        sim_outcomes_combo.nTotalStrokes
-    ]
+    # # histograms of survival times
+    # set_of_strokes = [
+    #     sim_outcomes_mono.nTotalStrokes,
+    #     sim_outcomes_combo.nTotalStrokes
+    # ]
 
-    # graph histograms
-    Figs.graph_histograms(
-        data_sets=set_of_strokes,
-        title='Histogram of patient stroke number',
-        x_label='Number of Strokes',
-        y_label='Counts',
-        bin_width=1,
-        legend=['Mono Therapy', 'Combination Therapy'],
-        transparency=0.6
-    )
+    # # graph histograms
+    # Figs.graph_histograms(
+    #     data_sets=set_of_strokes,
+    #     title='Histogram of patient stroke number',
+    #     x_label='Number of Strokes',
+    #     y_label='Counts',
+    #     bin_width=1,
+    #     legend=['Mono Therapy', 'Combination Therapy'],
+    #     transparency=0.6
+    # )
 
 
-def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
+def print_comparative_outcomes(sim_outcomes_none, sim_outcomes_anti):
     """ prints average increase in survival time, discounted cost, and discounted utility
     under combination therapy compared to mono therapy
     :param sim_outcomes_mono: outcomes of a cohort simulated under mono therapy
@@ -98,8 +97,8 @@ def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
     # increase in mean survival time under combination therapy with respect to mono therapy
     increase_survival_time = Stat.DifferenceStatIndp(
         name='Increase in mean survival time',
-        x=sim_outcomes_combo.survivalTimes,
-        y_ref=sim_outcomes_mono.survivalTimes)
+        x=sim_outcomes_anti.survivalTimes,
+        y_ref=sim_outcomes_none.survivalTimes)
 
     # estimate and CI
     estimate_CI = increase_survival_time.get_formatted_mean_and_interval(interval_type='c',
@@ -112,8 +111,8 @@ def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
     # increase in mean discounted cost under combination therapy with respect to mono therapy
     increase_discounted_cost = Stat.DifferenceStatIndp(
         name='Increase in mean discounted cost',
-        x=sim_outcomes_combo.costs,
-        y_ref=sim_outcomes_mono.costs)
+        x=sim_outcomes_anti.costs,
+        y_ref=sim_outcomes_none.costs)
 
     # estimate and CI
     estimate_CI = increase_discounted_cost.get_formatted_mean_and_interval(interval_type='c',
@@ -127,8 +126,8 @@ def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
     # increase in mean discounted utility under combination therapy with respect to mono therapy
     increase_discounted_utility = Stat.DifferenceStatIndp(
         name='Increase in mean discounted utility',
-        x=sim_outcomes_combo.utilities,
-        y_ref=sim_outcomes_mono.utilities)
+        x=sim_outcomes_anti.utilities,
+        y_ref=sim_outcomes_none.utilities)
 
     # estimate and CI
     estimate_CI = increase_discounted_utility.get_formatted_mean_and_interval(interval_type='c',
@@ -141,8 +140,8 @@ def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
     # increase in mean discounted utility under combination therapy with respect to mono therapy
     increase_num_strokes = Stat.DifferenceStatIndp(
         name='Increase in mean discounted utility',
-        x=sim_outcomes_combo.nTotalStrokes,
-        y_ref=sim_outcomes_mono.nTotalStrokes)
+        x=sim_outcomes_anti.nTotalStrokes,
+        y_ref=sim_outcomes_none.nTotalStrokes)
 
     # estimate and CI
     estimate_CI = increase_num_strokes.get_formatted_mean_and_interval(interval_type='c',
@@ -153,29 +152,29 @@ def print_comparative_outcomes(sim_outcomes_mono, sim_outcomes_combo):
           estimate_CI)
 
 
-def report_CEA_CBA(sim_outcomes_mono, sim_outcomes_combo):
+def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
     """ performs cost-effectiveness and cost-benefit analyses
     :param sim_outcomes_mono: outcomes of a cohort simulated under mono therapy
     :param sim_outcomes_combo: outcomes of a cohort simulated under combination therapy
     """
 
     # define two strategies
-    mono_therapy_strategy = Econ.Strategy(
+    no_therapy_strategy = Econ.Strategy(
         name='Mono Therapy',
-        cost_obs=sim_outcomes_mono.costs,
-        effect_obs=sim_outcomes_mono.utilities,
+        cost_obs=sim_outcomes_none.costs,
+        effect_obs=sim_outcomes_none.utilities,
         color='green'
     )
-    combo_therapy_strategy = Econ.Strategy(
+    anti_therapy_strategy = Econ.Strategy(
         name='Combination Therapy',
-        cost_obs=sim_outcomes_combo.costs,
-        effect_obs=sim_outcomes_combo.utilities,
+        cost_obs=sim_outcomes_anti.costs,
+        effect_obs=sim_outcomes_anti.utilities,
         color='blue'
     )
 
     # do CEA
     CEA = Econ.CEA(
-        strategies=[mono_therapy_strategy, combo_therapy_strategy],
+        strategies=[no_therapy_strategy, anti_therapy_strategy],
         if_paired=False
     )
 
@@ -192,7 +191,7 @@ def report_CEA_CBA(sim_outcomes_mono, sim_outcomes_combo):
 
     # CBA
     NBA = Econ.CBA(
-        strategies=[mono_therapy_strategy, combo_therapy_strategy],
+        strategies=[no_therapy_strategy, anti_therapy_strategy],
         if_paired=False
     )
     # show the net monetary benefit figure
