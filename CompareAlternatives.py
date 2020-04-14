@@ -15,8 +15,8 @@ cohort_none.simulate(sim_length=D.SIM_LENGTH)
 # simulating anticoagulation therapy
 # create a cohort
 cohort_anti = Cls.Cohort(id=1,
-                          pop_size=D.POP_SIZE,
-                          parameters=P.ParametersFixed(therapy=P.Therapies.ANTICOAG))
+                         pop_size=D.POP_SIZE,
+                         parameters=P.ParametersFixed(therapy=P.Therapies.ANTICOAG))
 # simulate the cohort
 cohort_anti.simulate(sim_length=D.SIM_LENGTH)
 
@@ -26,6 +26,9 @@ Support.print_outcomes(sim_outcomes=cohort_none.cohortOutcomes,
 Support.print_outcomes(sim_outcomes=cohort_anti.cohortOutcomes,
                        therapy_name=P.Therapies.ANTICOAG)
 
+# plot survival curves and histograms
+Support.plot_survival_curves_and_histograms(sim_outcomes_mono=cohort_none.cohortOutcomes,
+                                            sim_outcomes_combo=cohort_anti.cohortOutcomes)
 
 # print comparative outcomes
 Support.print_comparative_outcomes(sim_outcomes_none=cohort_none.cohortOutcomes,

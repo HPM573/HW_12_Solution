@@ -4,20 +4,28 @@ import numpy as np
 # simulation settings
 POP_SIZE = 5000         # cohort population size
 SIM_LENGTH = 50    # length of simulation (years)
-ALPHA = 0.05
+ALPHA = 0.05        # significance level for calculating confidence intervals
 DISCOUNT = 0.03     # annual discount rate
 
 ANNUAL_PROB_ALL_CAUSE_MORT = 18 / 1000
 ANNUAL_PROB_STROKE_MORT = 36.2 / 100000
 ANNUAL_PROB_FIRST_STROKE = 15 / 1000
-PROB_SURVIVE_FIRST_STROKE = 0.9
-PROB_SURVIVE_RECURRENT_STROKE = 0.8
+PROB_SURVIVE_FIRST_STROKE = 0.75
+PROB_SURVIVE_RECURRENT_STROKE = 0.7
 FIVE_YEAR_PROB_RECURRENT_STROKE = 0.17
 STROKE_DURATION = 1/52  # 1 week
 
-ANTICOAG_STROKE_REDUCTION = 0.25
+ANTICOAG_STROKE_REDUCTION = 0.45
 ANTICOAG_BLEEDING_DEATH_INCREASE = 0.05
 
+
+class HealthStates(Enum):
+    """ health states of patients """
+    WELL = 0
+    STROKE = 1
+    POST_STROKE = 2
+    STROKE_DEAD = 3
+    NATURAL_DEATH = 4
 
 
 ANNUAL_STATE_UTILITY = [
@@ -36,7 +44,8 @@ ANNUAL_STATE_COST = [
     0       # NATURAL DEATH
 ]
 
-ANTICOAG_COST = 750
+ANTICOAG_COST = 550
+STROKE_COST = 2000
 
 
 def get_trans_rate_matrix(with_treatment):

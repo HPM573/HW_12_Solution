@@ -26,21 +26,25 @@ class ParametersFixed:
         # initial health state
         self.initialHealthState = HealthStates.WELL
 
-        # annual treatment cost
-        if self.therapy == Therapies.NONE:
-            self.annualTreatmentCost = 0
-        if self.therapy == Therapies.ANTICOAG:
-            self.annualTreatmentCost = D.ANTICOAG_COST
-
         # transition probability matrix of the selected therapy
         self.rateMatrix = []
 
-        # calculate transition probabilities depending of which therapy options is in use
+        # calculate transition rate matrices depending of which therapy options is in use
         if therapy == Therapies.NONE:
             self.rateMatrix = D.get_trans_rate_matrix(with_treatment=False)
         else:
             self.rateMatrix = D.get_trans_rate_matrix(with_treatment=True)
 
+        # annual treatment cost
+        if self.therapy == Therapies.NONE:
+            self.annuaAntiCoagCost = 0
+        elif self.therapy == Therapies.ANTICOAG:
+            self.annuaAntiCoagCost = D.ANTICOAG_COST
+
+        # stroke cost
+        self.strokeCost = D.STROKE_COST
+
+        # state costs and utilities
         self.annualStateCosts = D.ANNUAL_STATE_COST
         self.annualStateUtilities = D.ANNUAL_STATE_UTILITY
 
