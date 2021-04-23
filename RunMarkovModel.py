@@ -1,10 +1,9 @@
-import MarkovClasses as Cls
-import SimPy.Plots.SamplePaths as Path
-import SimPy.Plots.Histogram as Hist
 import InputData as D
+import MarkovClasses as Cls
 import ParameterClasses as P
+import SimPy.Plots.Histogram as Hist
+import SimPy.Plots.SamplePaths as Path
 import Support as Support
-
 
 # selected therapy
 therapy = P.Therapies.NONE
@@ -12,7 +11,7 @@ therapy = P.Therapies.NONE
 # create a cohort
 myCohort = Cls.Cohort(id=1,
                       pop_size=D.POP_SIZE,
-                      parameters=P.ParametersFixed(therapy=therapy))
+                      parameters=P.Parameters(therapy=therapy))
 
 # simulate the cohort over the specified time steps
 myCohort.simulate(sim_length=D.SIM_LENGTH)

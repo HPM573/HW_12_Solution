@@ -1,4 +1,5 @@
 from enum import Enum
+
 import InputData as D
 
 
@@ -17,7 +18,7 @@ class Therapies(Enum):
     ANTICOAG = 1
 
 
-class ParametersFixed:
+class Parameters:
     def __init__(self, therapy):
 
         # selected therapy
@@ -27,13 +28,13 @@ class ParametersFixed:
         self.initialHealthState = HealthStates.WELL
 
         # transition probability matrix of the selected therapy
-        self.rateMatrix = []
+        self.transRateMatrix = []
 
         # calculate transition rate matrices depending of which therapy options is in use
         if therapy == Therapies.NONE:
-            self.rateMatrix = D.get_trans_rate_matrix(with_treatment=False)
+            self.transRateMatrix = D.get_trans_rate_matrix(with_treatment=False)
         else:
-            self.rateMatrix = D.get_trans_rate_matrix(with_treatment=True)
+            self.transRateMatrix = D.get_trans_rate_matrix(with_treatment=True)
 
         # annual treatment cost
         if self.therapy == Therapies.NONE:

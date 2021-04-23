@@ -1,9 +1,10 @@
-from InputData import HealthStates
-import SimPy.RandomVariantGenerators as RVGs
-import SimPy.MarkovClasses as Markov
-import SimPy.SamplePathClasses as Path
+import numpy as np
+
 import SimPy.EconEval as Econ
-import SimPy.StatisticalClasses as Stat
+import SimPy.Markov as Markov
+import SimPy.SamplePath as Path
+import SimPy.Statistics as Stat
+from InputData import HealthStates
 
 
 class Patient:
@@ -16,15 +17,14 @@ class Patient:
     def simulate(self, sim_length):
 
         # random number generator for this patient
-        rng = RVGs.RNG(seed=self.id)
+        rng = np.random.RandomState(seed=self.id)
         # gillespie algorithm
-        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.rateMatrix)
+        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.transRateMatrix)
 
         t = 0  # simulation time
         if_stop = False
 
         while not if_stop:
-
             # find time until next event (dt), and next state
             # (note that the gillespie algorithm returns None for dt if the process
             # is in an absorbing state)
@@ -32,20 +32,21 @@ class Patient:
                 current_state_index=self.stateMonitor.currentState.value,
                 rng=rng)
 
-            # stop if time to next event (dt) is None
+            # stop if time to next event (dt) is None (i.e. we have reached an absorbing state)
             if dt is None:
                 if_stop = True
 
-            # else if  the next event occurs beyond simulation length
-            elif dt + t > sim_length:
-                if_stop = True
-                # collect cost and health outcomes up to the simulation length
-                self.stateMonitor.costUtilityMonitor.update(time=sim_length,
-                                                            current_state=self.stateMonitor.currentState,
-                                                            next_state=self.stateMonitor.currentState)
             else:
-                # advance time to the time of next event
-                t += dt
+                # else if next event occurs beyond simulation length
+                if dt + t > sim_length:
+                    # advance time to the end of the simulation and stop
+                    t = sim_length
+                    # the individual stays in the current state until the end of the simulation
+                    new_state_index = self.stateMonitor.currentState.value
+                    if_stop = True
+                else:
+                    # advance time to the time of next event
+                    t += dt
                 # update health state
                 self.stateMonitor.update(time=t, new_state=HealthStates(new_state_index))
 
@@ -63,7 +64,7 @@ class PatientStateMonitor:
         if new_state in (HealthStates.STROKE_DEAD, HealthStates.NATURAL_DEATH):
             self.survivalTime = time
 
-        if new_state == HealthStates.STROKE:
+        if new_state in (HealthStates.STROKE, HealthStates.STROKE_DEAD):
             self.nStrokes += 1
 
         self.costUtilityMonitor.update(time=time,
@@ -176,10 +177,10 @@ class CohortOutcomes:
             self.costs.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedCost)
             self.utilities.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedUtility)
 
-        self.statNumStrokes = Stat.SummaryStat('Number of strokes',self.nTotalStrokes)
-        self.statSurvivalTime = Stat.SummaryStat('Survival Time',self.survivalTimes)
-        self.statCost = Stat.SummaryStat('Discounted Cost',self.costs)
-        self.statUtility = Stat.SummaryStat('Discounted Utility',self.utilities)
+        self.statNumStrokes = Stat.SummaryStat(name='Number of strokes', data=self.nTotalStrokes)
+        self.statSurvivalTime = Stat.SummaryStat(name='Survival Time', data=self.survivalTimes)
+        self.statCost = Stat.SummaryStat(name='Discounted Cost', data=self.costs)
+        self.statUtility = Stat.SummaryStat(name='Discounted Utility', data=self.utilities)
 
         self.nLivingPatients = Path.PrevalencePathBatchUpdate(
             name='# of living patients',
