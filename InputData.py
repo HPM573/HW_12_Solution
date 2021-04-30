@@ -46,7 +46,7 @@ ANNUAL_STATE_COST = [
 ]
 
 ANTICOAG_COST = 550
-STROKE_COST = 2000
+STROKE_COST = 5000
 
 
 def get_trans_rate_matrix(with_treatment):

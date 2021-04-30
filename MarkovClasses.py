@@ -92,7 +92,9 @@ class PatientCostUtilityMonitor:
     def update(self, time, current_state, next_state):
 
         # cost (per unit of time) during the period since the last recording until now
-        cost = self.params.annualStateCosts[current_state.value] + self.params.annuaAntiCoagCost
+        cost = self.params.annualStateCosts[current_state.value]
+        if current_state == HealthStates.POST_STROKE:
+            cost += self.params.annuaAntiCoagCost
 
         # discounted cost and utility (continuously compounded)
         discounted_cost = Econ.pv_continuous_payment(payment=cost,
@@ -100,7 +102,7 @@ class PatientCostUtilityMonitor:
                                                      discount_period=(self.tLastRecorded, time))
 
         # add discounted stoke cost, if stroke occurred
-        if next_state == HealthStates.STROKE_DEAD:
+        if next_state == HealthStates.STROKE:
             discounted_cost += Econ.pv_single_payment(payment=self.params.strokeCost,
                                                       discount_rate=self.params.discountRate,
                                                       discount_period=time,
