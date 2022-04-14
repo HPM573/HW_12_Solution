@@ -184,7 +184,8 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
     CEA.plot_CE_plane(
         title='Cost-Effectiveness Analysis',
         x_label='Additional QALYs',
-        y_label='Additional Cost'
+        y_label='Additional Cost',
+        interval_type='c'
     )
 
     # report the CE table
@@ -199,7 +200,7 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
     # CBA
     NBA = Econ.CBA(
         strategies=[no_therapy_strategy, anti_therapy_strategy],
-        wtp_range=[0, 100000],
+        wtp_range=[0, 50000],
         if_paired=False
     )
     # show the net monetary benefit figure

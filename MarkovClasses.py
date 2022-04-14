@@ -139,21 +139,19 @@ class Cohort:
         :param sim_length: simulation length
         """
 
-        # populate the cohort
-        patients = []
+        # populate and simulate the cohort
         for i in range(self.popSize):
             # create a new patient (use id * pop_size + n as patient id)
-            patient = Patient(id=self.id * self.popSize + i, parameters=self.params)
-            # add the patient to the cohort
-            patients.append(patient)
-
-        # simulate all patients
-        for patient in patients:
+            patient = Patient(id=self.id * self.popSize + i,
+                              parameters=self.params)
             # simulate
             patient.simulate(sim_length)
 
-        # store outputs of this simulation
-        self.cohortOutcomes.extract_outcomes(patients)
+            # store outputs of this simulation
+            self.cohortOutcomes.extract_outcome(simulated_patient=patient)
+
+        # calculate cohort outcomes
+        self.cohortOutcomes.calculate_cohort_outcomes(initial_pop_size=self.popSize)
 
 
 class CohortOutcomes:
@@ -170,23 +168,32 @@ class CohortOutcomes:
         self.statCost = None
         self.statUtility = None
 
-    def extract_outcomes(self, simulated_patients):
+    def extract_outcome(self, simulated_patient):
+        """ extracts outcomes of a simulated patient
+        :param simulated_patient: a simulated patient"""
 
-        for patient in simulated_patients:
-            if not (patient.stateMonitor.survivalTime is None):
-                self.survivalTimes.append(patient.stateMonitor.survivalTime)
-            self.nTotalStrokes.append(patient.stateMonitor.nStrokes)
-            self.costs.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedCost)
-            self.utilities.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedUtility)
+        # record survival time and time until AIDS
+        if not (simulated_patient.stateMonitor.survivalTime is None):
+            self.survivalTimes.append(simulated_patient.stateMonitor.survivalTime)
+        self.nTotalStrokes.append(simulated_patient.stateMonitor.nStrokes)
+        self.costs.append(simulated_patient.stateMonitor.costUtilityMonitor.totalDiscountedCost)
+        self.utilities.append(simulated_patient.stateMonitor.costUtilityMonitor.totalDiscountedUtility)
 
+    def calculate_cohort_outcomes(self, initial_pop_size):
+        """ calculates the cohort outcomes
+        :param initial_pop_size: initial population size
+        """
+
+        # summary statistics
         self.statNumStrokes = Stat.SummaryStat(name='Number of strokes', data=self.nTotalStrokes)
         self.statSurvivalTime = Stat.SummaryStat(name='Survival Time', data=self.survivalTimes)
         self.statCost = Stat.SummaryStat(name='Discounted Cost', data=self.costs)
         self.statUtility = Stat.SummaryStat(name='Discounted Utility', data=self.utilities)
 
+        # survival curve
         self.nLivingPatients = Path.PrevalencePathBatchUpdate(
             name='# of living patients',
-            initial_size=len(simulated_patients),
+            initial_size=initial_pop_size,
             times_of_changes=self.survivalTimes,
-            increments=[-1]*len(self.survivalTimes)
+            increments=[-1] * len(self.survivalTimes)
         )
