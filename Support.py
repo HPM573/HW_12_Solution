@@ -185,7 +185,9 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
         title='Cost-Effectiveness Analysis',
         x_label='Additional QALYs',
         y_label='Additional Cost',
-        interval_type='c'
+        interval_type='c',
+        x_range=(-0.5, 1),
+        y_range=(-1000, 10000)
     )
 
     # report the CE table

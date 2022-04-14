@@ -6,7 +6,7 @@ import SimPy.Plots.SamplePaths as Path
 import Support as Support
 
 # selected therapy
-therapy = P.Therapies.NONE
+therapy = P.Therapies.ANTICOAG
 
 # create a cohort
 myCohort = Cls.Cohort(id=1,
