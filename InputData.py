@@ -4,19 +4,19 @@ import numpy as np
 
 # simulation settings
 POP_SIZE = 5000         # cohort population size
-SIM_LENGTH = 20    # length of simulation (years)
+SIM_LENGTH = 25    # length of simulation (years)
 ALPHA = 0.05        # significance level for calculating confidence intervals
 DISCOUNT = 0.03     # annual discount rate
 
 ANNUAL_PROB_ALL_CAUSE_MORT = 41.4 / 1000
 ANNUAL_PROB_STROKE_MORT = 36.2 / 100000
-ANNUAL_PROB_FIRST_STROKE = 15 / 1000
+ANNUAL_PROB_FIRST_STROKE = 25 / 1000
 PROB_SURVIVE_FIRST_STROKE = 0.75
 PROB_SURVIVE_RECURRENT_STROKE = 0.7
-FIVE_YEAR_PROB_RECURRENT_STROKE = 0.17
+FIVE_YEAR_PROB_RECURRENT_STROKE = 0.35
 STROKE_DURATION = 1/52  # 1 week
 
-ANTICOAG_STROKE_REDUCTION = 0.8  # % reduction
+ANTICOAG_STROKE_REDUCTION = 0.75  # % reduction
 ANTICOAG_BLEEDING_DEATH_INCREASE = 0.05  # % increase
 
 
@@ -45,7 +45,7 @@ ANNUAL_STATE_COST = [
     0       # NATURAL DEATH
 ]
 
-ANTICOAG_COST = 2000
+ANTICOAG_COST = 3000
 STROKE_COST = 5000
 
 
@@ -97,7 +97,7 @@ def get_trans_rate_matrix(with_treatment):
     return rate_matrix
 
 
-# print('Transition rate matrix with no treatment:')
-# print(get_trans_rate_matrix(with_treatment=False))
-# print('Transition rate matrix with treatment:')
-# print(get_trans_rate_matrix(with_treatment=True))
+print('Transition rate matrix with no treatment:')
+print(get_trans_rate_matrix(with_treatment=False))
+print('Transition rate matrix with treatment:')
+print(get_trans_rate_matrix(with_treatment=True))
