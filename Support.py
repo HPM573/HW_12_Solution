@@ -1,8 +1,9 @@
+import deampy.econ_eval as econ
+import deampy.plots.histogram as hist
+import deampy.plots.sample_paths as path
+import deampy.statistics as stats
+
 import InputData as D
-import SimPy.EconEval as Econ
-import SimPy.Plots.Histogram as Hist
-import SimPy.Plots.SamplePaths as Path
-import SimPy.Statistics as Stat
 
 
 def print_outcomes(sim_outcomes, therapy_name):
@@ -61,7 +62,7 @@ def plot_survival_curves_and_histograms(sim_outcomes_mono, sim_outcomes_combo):
     ]
 
     # graph survival curve
-    Path.plot_sample_paths(
+    path.plot_sample_paths(
         sample_paths=survival_curves,
         title='Survival curve',
         x_label='Simulation time step (year)',
@@ -77,7 +78,7 @@ def plot_survival_curves_and_histograms(sim_outcomes_mono, sim_outcomes_combo):
     ]
 
     # graph histograms
-    Hist.plot_histograms(
+    hist.plot_histograms(
         data_sets=set_of_strokes,
         title='Histogram of patient stroke number',
         x_label='Number of Strokes',
@@ -92,12 +93,12 @@ def plot_survival_curves_and_histograms(sim_outcomes_mono, sim_outcomes_combo):
 def print_comparative_outcomes(sim_outcomes_none, sim_outcomes_anti):
     """ prints average increase in survival time, discounted cost, and discounted utility
     under combination therapy compared to mono therapy
-    :param sim_outcomes_mono: outcomes of a cohort simulated under mono therapy
-    :param sim_outcomes_combo: outcomes of a cohort simulated under combination therapy
+    :param sim_outcomes_none: outcomes of a cohort simulated under no anticoagulation
+    :param sim_outcomes_anti: outcomes of a cohort simulated under anticoagulation
     """
 
     # increase in mean survival time under combination therapy with respect to mono therapy
-    increase_survival_time = Stat.DifferenceStatIndp(
+    increase_survival_time = stats.DifferenceStatIndp(
         name='Increase in mean survival time',
         x=sim_outcomes_anti.survivalTimes,
         y_ref=sim_outcomes_none.survivalTimes)
@@ -111,7 +112,7 @@ def print_comparative_outcomes(sim_outcomes_none, sim_outcomes_anti):
           estimate_CI)
 
     # increase in mean discounted cost under combination therapy with respect to mono therapy
-    increase_discounted_cost = Stat.DifferenceStatIndp(
+    increase_discounted_cost = stats.DifferenceStatIndp(
         name='Increase in mean discounted cost',
         x=sim_outcomes_anti.costs,
         y_ref=sim_outcomes_none.costs)
@@ -126,7 +127,7 @@ def print_comparative_outcomes(sim_outcomes_none, sim_outcomes_anti):
           estimate_CI)
 
     # increase in mean discounted utility under combination therapy with respect to mono therapy
-    increase_discounted_utility = Stat.DifferenceStatIndp(
+    increase_discounted_utility = stats.DifferenceStatIndp(
         name='Increase in mean discounted utility',
         x=sim_outcomes_anti.utilities,
         y_ref=sim_outcomes_none.utilities)
@@ -140,7 +141,7 @@ def print_comparative_outcomes(sim_outcomes_none, sim_outcomes_anti):
           estimate_CI)
 
     # increase in mean discounted utility under combination therapy with respect to mono therapy
-    increase_num_strokes = Stat.DifferenceStatIndp(
+    increase_num_strokes = stats.DifferenceStatIndp(
         name='Increase in mean discounted utility',
         x=sim_outcomes_anti.nTotalStrokes,
         y_ref=sim_outcomes_none.nTotalStrokes)
@@ -161,13 +162,13 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
     """
 
     # define two strategies
-    no_therapy_strategy = Econ.Strategy(
+    no_therapy_strategy = econ.Strategy(
         name='No Anticoagulation ',
         cost_obs=sim_outcomes_none.costs,
         effect_obs=sim_outcomes_none.utilities,
         color='green'
     )
-    anti_therapy_strategy = Econ.Strategy(
+    anti_therapy_strategy = econ.Strategy(
         name='With Anticoagulation',
         cost_obs=sim_outcomes_anti.costs,
         effect_obs=sim_outcomes_anti.utilities,
@@ -175,7 +176,7 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
     )
 
     # do CEA
-    CEA = Econ.CEA(
+    CEA = econ.CEA(
         strategies=[no_therapy_strategy, anti_therapy_strategy],
         if_paired=False
     )
@@ -200,7 +201,7 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
         file_name='CETable.csv')
 
     # CBA
-    NBA = Econ.CBA(
+    NBA = econ.CBA(
         strategies=[no_therapy_strategy, anti_therapy_strategy],
         wtp_range=[0, 50000],
         if_paired=False

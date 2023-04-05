@@ -1,9 +1,9 @@
+import deampy.econ_eval as econ
+import deampy.statistics as stats
 import numpy as np
+from deampy.markov import Gillespie
+from deampy.plots.sample_paths import PrevalencePathBatchUpdate
 
-import SimPy.EconEval as Econ
-import SimPy.Markov as Markov
-import SimPy.SamplePath as Path
-import SimPy.Statistics as Stat
 from InputData import HealthStates
 
 
@@ -19,7 +19,7 @@ class Patient:
         # random number generator for this patient
         rng = np.random.RandomState(seed=self.id)
         # gillespie algorithm
-        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.transRateMatrix)
+        gillespie = Gillespie(transition_rate_matrix=self.params.transRateMatrix)
 
         t = 0  # simulation time
         if_stop = False
@@ -97,20 +97,20 @@ class PatientCostUtilityMonitor:
             cost += self.params.annuaAntiCoagCost
 
         # discounted cost and utility (continuously compounded)
-        discounted_cost = Econ.pv_continuous_payment(payment=cost,
+        discounted_cost = econ.pv_continuous_payment(payment=cost,
                                                      discount_rate=self.params.discountRate,
                                                      discount_period=(self.tLastRecorded, time))
 
         # add discounted stoke cost, if stroke occurred
         if next_state == HealthStates.STROKE:
-            discounted_cost += Econ.pv_single_payment(payment=self.params.strokeCost,
+            discounted_cost += econ.pv_single_payment(payment=self.params.strokeCost,
                                                       discount_rate=self.params.discountRate,
                                                       discount_period=time,
                                                       discount_continuously=True)
 
         # utility (per unit of time) during the period since the last recording until now
         utility = self.params.annualStateUtilities[current_state.value]
-        discounted_utility = Econ.pv_continuous_payment(payment=utility,
+        discounted_utility = econ.pv_continuous_payment(payment=utility,
                                                         discount_rate=self.params.discountRate,
                                                         discount_period=(self.tLastRecorded, time))
 
@@ -185,13 +185,13 @@ class CohortOutcomes:
         """
 
         # summary statistics
-        self.statNumStrokes = Stat.SummaryStat(name='Number of strokes', data=self.nTotalStrokes)
-        self.statSurvivalTime = Stat.SummaryStat(name='Survival Time', data=self.survivalTimes)
-        self.statCost = Stat.SummaryStat(name='Discounted Cost', data=self.costs)
-        self.statUtility = Stat.SummaryStat(name='Discounted Utility', data=self.utilities)
+        self.statNumStrokes = stats.SummaryStat(name='Number of strokes', data=self.nTotalStrokes)
+        self.statSurvivalTime = stats.SummaryStat(name='Survival Time', data=self.survivalTimes)
+        self.statCost = stats.SummaryStat(name='Discounted Cost', data=self.costs)
+        self.statUtility = stats.SummaryStat(name='Discounted Utility', data=self.utilities)
 
         # survival curve
-        self.nLivingPatients = Path.PrevalencePathBatchUpdate(
+        self.nLivingPatients = PrevalencePathBatchUpdate(
             name='# of living patients',
             initial_size=initial_pop_size,
             times_of_changes=self.survivalTimes,
