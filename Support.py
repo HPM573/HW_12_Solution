@@ -213,7 +213,8 @@ def report_CEA_CBA(sim_outcomes_none, sim_outcomes_anti):
         y_label='Marginal Net Monetary Benefit ($)',
         interval_type='c',
         show_legend=True,
-        figure_size=(6, 5)
+        figure_size=(6, 5),
+        y_range=(-30000, 40000)
     )
 
 
